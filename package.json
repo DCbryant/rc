@@ -1,6 +1,10 @@
 {
-  "name": "dc-design-component",
-  "version": "0.1.4",
+  "name": "@dcbryant/rc",
+  "repository": "https://github.com/dcbryant/rc",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/@dcbryant"
+  },
+  "version": "0.1.6",
   "private": false,
   "dependencies": {
     "polished": "^3.6.5"
@@ -11,9 +15,6 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/@DCbryant"
-  },
   "peerDependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
