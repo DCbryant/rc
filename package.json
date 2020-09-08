@@ -10,9 +10,10 @@
     "polished": "^3.6.5"
   },
   "files": [
-		"dist"
+    "dist"
   ],
-  "module": "dist/index.js",
+  "main": "dist/atom-design-explorer.js",
+	"module": "dist/atom-design-explorer.modern.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "peerDependencies": {
@@ -31,20 +32,22 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "tsc -p tsconfig.build.json",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "storybook": "start-storybook -p 6006 -s public",
     "build-storybook": "build-storybook --no-dll --quiet",
-    "coverage": "react-scripts test --coverage --watchAll=false"
+    "coverage": "react-scripts test --coverage --watchAll=false",
+    "build-cjs": "microbundle build --tsconfig tsconfig.build.json --jsx React.createElement  --compress=false --format cjs",
+    "build-all": "microbundle build --tsconfig tsconfig.build.json --jsx React.createElement  --compress=false",
+    "build": "npm run build-all & npm run build-cjs"
   },
   "jest": {
-		"collectCoverageFrom": [
-			"!src/**/*.stories.tsx",
-			"src/**/*.tsx",
-			"!src/**/*.snap"
-		]
-	},
+    "collectCoverageFrom": [
+      "!src/**/*.stories.tsx",
+      "src/**/*.tsx",
+      "!src/**/*.snap"
+    ]
+  },
   "eslintConfig": {
     "extends": "react-app"
   },
@@ -71,10 +74,6 @@
     "@storybook/node-logger": "^6.0.7",
     "@storybook/preset-create-react-app": "^3.1.4",
     "@storybook/react": "^6.0.7",
-    "@types/styled-components": "^5.1.2",
-    "babel-loader": "^8.1.0",
-    "react-docgen-typescript-loader": "^3.7.2",
-    "react-is": "^16.13.1",
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
@@ -82,10 +81,15 @@
     "@types/node": "^12.12.54",
     "@types/react": "^16.9.46",
     "@types/react-dom": "^16.9.8",
+    "@types/styled-components": "^5.1.2",
+    "babel-loader": "^8.1.0",
+    "microbundle": "^0.12.3",
     "react": ">=16.8.0",
+    "react-docgen-typescript-loader": "^3.7.2",
     "react-dom": ">=16.8.0",
+    "react-is": "^16.13.1",
     "react-scripts": "3.4.3",
-    "typescript": "^3.7.5",
-    "styled-components": "^5.1.1"
+    "styled-components": "^5.1.1",
+    "typescript": "^3.7.5"
   }
 }
