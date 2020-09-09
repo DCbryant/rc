@@ -40,4 +40,4 @@ export function Icon(props: IconProps) {
 Icon.defaultProps = {
   block: false,
 	color: "black",
-}
+};
