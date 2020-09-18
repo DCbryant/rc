@@ -7,13 +7,14 @@
   "version": "0.1.6",
   "private": false,
   "dependencies": {
+    "axios": "^0.20.0",
     "polished": "^3.6.5"
   },
   "files": [
     "dist"
   ],
   "main": "dist/atom-design-explorer.js",
-	"module": "dist/atom-design-explorer.modern.js",
+  "module": "dist/atom-design-explorer.modern.js",
   "types": "dist/index.d.ts",
   "sideEffects": false,
   "peerDependencies": {
