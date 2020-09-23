@@ -10,7 +10,7 @@ import React, {
 const Context = createContext(null);
 
 // 在最外层
-export function AliveScope(props) {
+export function AliveScope(props: any) {
 	const [state, setState] = useState({});
 	const ref = useMemo(() => {
 		return {};
