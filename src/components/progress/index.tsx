@@ -129,6 +129,7 @@ export function Progress(props: ProgressProps) {
 	const [state, setState] = useState(0);
 	const [dasharray, setdashArray] = useState("");
 
+	// 设置进度
 	useMemo(() => {
 		if (count < 0) {
 			setState(0)
@@ -141,6 +142,7 @@ export function Progress(props: ProgressProps) {
 
 	useEffect(() => {
 		if (circle) {
+			// 进度
 			let percent = state / 100
 			let perimeter = Math.PI * 2 * 170; //周长
 			let dasharray =
@@ -161,7 +163,9 @@ export function Progress(props: ProgressProps) {
 							transform: "rotate(270deg)",
 						}}
 					>
+						{/* defs 允许我们定义以后需要重复使用的图形元素 */}
 						<defs>
+							{/* 圆环颜色 */}
 							<radialGradient
 								id="linear"
 								r="100%"
@@ -173,6 +177,7 @@ export function Progress(props: ProgressProps) {
 								<stop offset="100%" stopColor={secondary} />
 							</radialGradient>
 						</defs>
+						{/* 未完成部分 */}
 						<circle
 							cx="210"
 							cy="210"
@@ -181,6 +186,7 @@ export function Progress(props: ProgressProps) {
 							stroke={bottomColor}
 							fill="none"
 						></circle>
+						{/* 圆环进度已完成部分 */}
 						<circle
 							cx="210"
 							cy="210"
@@ -190,6 +196,7 @@ export function Progress(props: ProgressProps) {
 							fill="none"
 							opacity={state === 0 ? 0 : 1}
 							strokeLinecap="round"
+							// strokeDasharray控制圆环进度
 							strokeDasharray={dasharray}
 							strokeDashoffset={"0px"}
 							style={{

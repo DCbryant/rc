@@ -48,19 +48,21 @@ export const createMessage = (type: MessageType) => {
 		if (!wrap) {
 			//如果有的话，说明已经调用过这个函数了，这个空div就可以一直复用
 			wrap = document.createElement("div");
-			wrap.style.cssText = `line-height:
-		1.5;text-align:
-		center;color: #333;
-		box-sizing: border-box;
-		margin: 0;
-		padding: 0;
-		list-style: none;
-		position: fixed;
-		z-index: 100000;
-		width: 100%;
-		top: 16px;
-		left: 0;
-		pointer-events: none;`;
+			wrap.style.cssText = `
+			  line-height:
+				1.5;text-align:
+				center;color: #333;
+				box-sizing: border-box;
+				margin: 0;
+				padding: 0;
+				list-style: none;
+				position: fixed;
+				z-index: 100000;
+				width: 100%;
+				top: 16px;
+				left: 0;
+				pointer-events: none;
+			`;
 			if (wrap) {
 				fconfig.mount.appendChild(wrap); //挂body上
 			}

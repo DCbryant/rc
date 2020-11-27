@@ -13,7 +13,6 @@ import styled from "styled-components";
 import { color } from "../shared/styles";
 import Radio from "../radio";
 
-
 const Transition = styled.div<TransitionType>`
 	${(props) =>
 		!props.animatein &&
@@ -45,13 +44,13 @@ const Transition = styled.div<TransitionType>`
 `;
 
 interface WrapperProps {
-  viewportBoxshadow: string
+	viewportBoxshadow: string;
 }
 
 const Wrapper = styled.div<WrapperProps>`
-  box-shadow: ${props => props.viewportBoxshadow};
-  padding: 10px;
-  border-radius: 5px;
+	box-shadow: ${(props) => props.viewportBoxshadow};
+	padding: 10px;
+	border-radius: 5px;
 `;
 
 export type CarouselProps = {
@@ -81,34 +80,37 @@ export type CarouselProps = {
 	viewportBoxshadow: string;
 };
 
-function currentSetMap (
-  current: number,
-  map: [number, number, number]
+function currentSetMap(
+	current: number,
+	map: [number, number, number]
 ): [number, number, number] {
-  let mid = map[1]
-  if (mid === current) {
-    return map
-  } else if (mid < current) {
-    return [mid, current, -1]
-  } else {
-    return [-1, current, mid]
-  }
+	let mid = map[1];
+	if (mid === current) {
+		return map;
+	} else if (mid < current) { //向右走
+		return [mid, current, -1];
+	} else { //向左走
+		return [-1, current, mid];
+	}
 }
 
-function mapToState (
-  map: [number, number, number],
-  children: ReactNode,
-  totalLen: number
+function mapToState(
+	map: [number, number, number],
+	children: ReactNode,
+	totalLen: number
 ) {
-  if (totalLen <= 1) {
-    return [null, children, null];
-  } else {
-    return map.map(v => {
-      if (v === -1) return null;
-      let child = children as ReactNode;
-      return child[v]
-    })
-  }
+	if (totalLen <= 1) {
+		return [null, children, null];
+	} else {
+		return map.map((v) => {
+			if (v === -1) {
+				return null;
+			} else {
+				let child = children as ReactElement[];
+				return child[v];
+			}
+		});
+	}
 }
 
 interface AnimationType {
@@ -120,31 +122,32 @@ interface TransitionType extends AnimationType {
 	width: number;
 }
 
-function toMove (
-  right: boolean,
-  totalLen: number,
-  indexMap: [number, number, number],
-  setIndexMap: React.Dispatch<React.SetStateAction<[number, number, number]>>
+function toMove(
+	right: boolean,
+	totalLen: number,
+	indexMap: [number, number, number],
+	setIndexMap: React.Dispatch<React.SetStateAction<[number, number, number]>>
 ) {
-  let y
-  if (right) {
-    if (indexMap[1] < totalLen - 1) {
-      y = indexMap[1] + 1
-    } else {
-      y = 0
-    }
-  } else {
-    if (indexMap[1] === 0) {
-      y = totalLen - 1
-    } else {
-      y = indexMap[1] - 1
-    }
-  }
-  setIndexMap(currentSetMap(y, indexMap))
+	let y;
+	if (right) {
+		if (indexMap[1] < totalLen - 1) {
+			y = indexMap[1] + 1;
+		} else {
+			y = 0;
+		}
+	} else {
+		if (indexMap[1] === 0) {
+			y = totalLen - 1;
+		} else {
+			y = indexMap[1] - 1;
+		}
+	}
+	const map = currentSetMap(y, indexMap)
+	setIndexMap(map);
 }
 
 export function Carousel(props: PropsWithChildren<CarouselProps>) {
-  const {
+	const {
 		defaultIndex,
 		height,
 		autoplayDelay,
@@ -158,116 +161,123 @@ export function Carousel(props: PropsWithChildren<CarouselProps>) {
 		classname,
 		children,
 		viewportBoxshadow,
-  } = props;
-  
+	} = props;
+	//设置需要展示的元素
+	const [state, setState] = useState<ReactNode[]>([]);
+	//设置显示索引用
+	const [indexMap, setIndexMap] = useState<[number, number, number]>([
+		-1,
+		-1,
+		-1,
+	]);
+	//控制方向进出用
+	const [animation, setAnimation] = useState<AnimationType>({
+		animatein: true,
+		direction: "",
+	});
+	const ref = useRef<HTMLDivElement>(null);
+	//设置宽度用
+	const [bound, setBound] = useState<DOMRect>();
+	const totalLen = useMemo(() => {
+		let len: number;
+		if (children instanceof Array) {
+			len = children.length;
+		} else {
+			len = 1;
+		}
+		return len;
+	}, [children]);
 
-  const [state, setState] = useState<ReactNode[]>([])
-  const [indexMap, setIndexMap] = useState<[number, number, number]>([
-    -1, -1, -1,
-  ]);
-  const [animation, setAnimation] = useState<AnimationType>({
-    animatein: true,
-    direction: ""
-  });
+	useMemo(() => {
+		let map: [number, number, number] = [-1, -1, -1];
+		map[1] = defaultIndex!;
+		let res = mapToState(map, children, totalLen);
+		setState(res);
+		setIndexMap(map);
+	}, [defaultIndex, children, totalLen]);
 
-  const [bound, setBound] = useState<DOMRect>()
+	useEffect(() => {
+		let child = children as ReactElement[];
+		let timer: number;
+		if (child) {
+			let tmp = indexMap.map((v) => {
+				return v !== -1 ? child[v] : null;
+			});
+			let sign: boolean;
+			setState(tmp); //后setState会有补足问题必须先设
 
-  const totalLen = useMemo(() => {
-    let len: number
-    if (Array.isArray(children)) {
-      len = children.length
-    } else {
-      len = 1;
-    }
-    return len
-  }, [children])
+			if (indexMap[0] === -1 && indexMap[2] === -1) {
+				//首轮
+				return;
+			} else if (indexMap[0] === -1) {
+				sign = true;
+				setAnimation({ animatein: false, direction: "right" });
+			} else {
+				sign = false;
+				setAnimation({ animatein: false, direction: "left" });
+			}
+			timer = window.setTimeout(() => {
+				if (sign) {
+					setAnimation({ animatein: true, direction: "right" });
+				} else {
+					setAnimation({ animatein: true, direction: "left" });
+				}
+			}, delay!);
+		}
+		return () => window.clearTimeout(timer);
+	}, [delay, indexMap, children]);
 
-  useMemo(() => {
-    let map: [number, number, number] = [-1, -1, -1];
-    map[1] = defaultIndex!
-    let res = mapToState(map, children, totalLen)
-    setState(res)
-    setIndexMap(map)
-  }, [defaultIndex, children, totalLen])
+	// 监听窗口宽度变化
+	useEffect(() => {
+		const setBoundFunc = () => {
+			if (ref.current) {
+				let bounds = ref.current.getBoundingClientRect();
+				setBound(bounds);
+			}
+		};
+		setBoundFunc();
+		const resizefunc = () => {
+			setBoundFunc();
+		};
+		window.addEventListener("resize", resizefunc);
+		return () => {
+			window.removeEventListener("resize", resizefunc);
+		};
+	}, []);
 
-  useEffect(() => {
-    let child = children as ReactElement[]
-    let timer: number
-    if (child) {
-      let tmp = indexMap.map(v => {
-        return v !== -1 ? child[v] : null
-      })
-      let sign: boolean
-      setState(tmp)
+	useEffect(() => {
+		let timer: number;
+		if (autoplay) {
+			timer = window.setTimeout(() => {
+				toMove(!autoplayReverse!, totalLen, indexMap, setIndexMap);
+			}, autoplayDelay);
+		}
+		return () => window.clearTimeout(timer);
+	}, [autoplay, autoplayDelay, indexMap, totalLen, autoplayReverse]);
 
-      if (indexMap[0] === -1 && indexMap[2] === -1) {
-        return;
-      } else if (indexMap[0] === -1) {
-        sign = true
-        setAnimation({animatein: false, direction: "right"})
-      } else {
-        sign = false
-        setAnimation({animatein: false, direction: "left"})
-      }
+	const [start, setStart] = useState(0);
 
-      timer = window.setTimeout(() => {
-        if (sign) {
-          setAnimation({ animatein: true, direction: "right" });
-        } else {
-          setAnimation({ animatein: true, direction: "left" });
-        }
-      }, delay!)
+	const touchStart = (e: TouchEvent<HTMLDivElement>) => {
+		setStart(e.touches[0].clientX);
+	};
 
-      return () => window.clearTimeout(timer)
-    }
-  }, [delay, indexMap, children])
+	const touchEnd = (e: TouchEvent<HTMLDivElement>) => {
+		let end = e.changedTouches[0].clientX;
+		let val = end - start;
+		let abs = Math.abs(val);
+		if (abs > touchDiff!) {
+			//说明可以进一步判断
+			if (val > 0) {
+				//从左往右 向左翻
+				toMove(false, totalLen, indexMap, setIndexMap);
+			} else {
+				toMove(true, totalLen, indexMap, setIndexMap);
+			}
+		}
+	};
 
-  const ref = useRef<HTMLDivElement>(null)
-  useEffect(() => {
-    const setBoundFunc = () => {
-      if (ref.current) {
-        let bounds = ref.current.getBoundingClientRect()
-        setBound(bounds)
-      }
-    }
-    setBoundFunc()
-    const resizeFunc = () => {
-      setBoundFunc()
-    }
-    window.addEventListener("resize", resizeFunc);
-    return () => {
-      window.removeEventListener("resize", resizeFunc)
-    }
-  }, [])
 
-  useEffect(() => {
-    let timer : number
-    if (autoplay) {
-      timer = window.setTimeout(() => {
-        toMove(!autoplayReverse!, totalLen, indexMap, setIndexMap)
-      }, autoplayDelay)
-    }
-    return () => window.clearTimeout(timer)
-  }, [autoplay, autoplayDelay, indexMap, totalLen, autoplayReverse])
-
-  const [start, setStart] = useState(0)
-  const touchStart = (e: TouchEvent<HTMLDivElement>) => {
-    setStart(e.touches[0].clientX)
-  }
-  const touchEnd = (e: TouchEvent<HTMLDivElement>) => {
-    let end = e.touches[0].clientX
-    let val = end - start
-    let abs = Math.abs(val)
-    if (abs > touchDiff!) {
-      if (val > 0) {
-        toMove(false, totalLen, indexMap, setIndexMap);
-      } else {
-        toMove(true, totalLen, indexMap, setIndexMap);
-      }
-    }
-  }
-
-  return (
+	return (
 		<Wrapper
 			ref={ref}
 			style={style}
@@ -334,8 +344,8 @@ export function Carousel(props: PropsWithChildren<CarouselProps>) {
 								checked={y === indexMap[1]}
 								onChange={() => {}}
 								onClick={() => {
-									let newMap = currentSetMap(y, indexMap);
-									setIndexMap(newMap);
+									let newmap = currentSetMap(y, indexMap);
+									setIndexMap(newmap);
 								}}
 							/>
 						</li>
@@ -345,3 +355,15 @@ export function Carousel(props: PropsWithChildren<CarouselProps>) {
 		</Wrapper>
 	);
 }
+Carousel.defaultProps = {
+	defaultIndex: 0,
+	delay: 100,
+	height: 200,
+	autoplay: true,
+	autoplayDelay: 5000,
+	animationDelay: 500,
+	autoplayReverse: false,
+	touchDiff: 100,
+	viewportBoxshadow: "2px 2px 4px #d9d9d9",
+};
+export default Carousel;

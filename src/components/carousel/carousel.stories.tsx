@@ -57,7 +57,7 @@ export const knobsCarousel = () => {
 			viewportBoxshadow={text("viewportBoxshadow", "2px 2px 4px #d9d9d9")}
 			autoplayReverse={boolean("autoplayReverse", false)}
 			animationDelay={number("animationDelay", 500)}
-			autoplayDelay={number("autoplayDelay", 5000)}
+			autoplayDelay={number("autoplayDelay", 1000)}
 		>
 			{new Array(num).fill(height).map((v, i) => DivExample(v, i))}
 		</Carousel>

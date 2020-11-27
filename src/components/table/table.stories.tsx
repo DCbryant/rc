@@ -74,7 +74,7 @@ export const knobsTable = () => (
 		columns={columns}
 		data={data}
 		sorted={boolean("sorted", true)}
-		pagination={boolean("pagination", false)}
+		pagination={boolean("pagination", true)}
 		pageSize={number("pageSize", 2)}
 	></Table>
 );

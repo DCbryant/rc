@@ -130,12 +130,13 @@ export function Table(props: TableProps) {
 			let len = data.length;
 			let pagenumber = Math.ceil(len / pageSize!); //页数
 			for (let i = 0; i < pagenumber; i++) {
-				//每页该显示多少内容做好。
+				//每页该显示多少内容做好，根据页数进行分组
 				tmp[i] = data.slice(
 					0 + i * pageSize!,
 					pageSize! + i * pageSize!
 				);
 			}
+			console.log(tmp, "tmp")
 			setPaginationData(tmp);
 		};
 	}, [pageSize]);
