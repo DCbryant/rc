@@ -1,8 +1,6 @@
-import React, { PropsWithChildren, ReactNode, useMemo, useState } from "react";
+import React, { ReactNode, useMemo, useState } from "react";
 import styled from "styled-components";
-import { color, typography } from "../shared/styles";
-import { darken, rgba, opacify } from "polished";
-import { easing } from "../shared/animation";
+import { color } from "../shared/styles";
 import Pagination from "../pagination";
 import { Icon } from "../icon";
 
