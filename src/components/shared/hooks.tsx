@@ -47,6 +47,7 @@ export function useDebounce<T>(value: T, delay = 300) {
 	}, [value, delay]);
 	return debounceValue;
 }
+
 export function useThrottle<T>(value: T, delay = 300) {
 	const [throttleValue, setThrottledValue] = useState(value);
 	const flag = useMemo(() => {
@@ -68,6 +69,7 @@ export function useThrottle<T>(value: T, delay = 300) {
 	}, [value, delay]);
 	return throttleValue;
 }
+
 export function throttle(fn: Function, delay: number = 300) {
 	let flag = true;
 	return function(...args: any) {
